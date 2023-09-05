@@ -11,8 +11,8 @@ def iter_cannabs_from_file(path: str) -> Iterator[Dict[str, Any]]:
             yield cannab
 
 
-def create_staging_table(cursor):
-    cursor.execute("""
+def create_staging_table(cursor, datetime):
+    cursor.execute(f"""
         CREATE TABLE IF NOT EXISTS cannabis (
             id                            integer,
             uid                           Character(36) not null,
@@ -30,6 +30,8 @@ def create_staging_table(cursor):
             date_downloaded               date not null,
             PRIMARY KEY (uid)
         );
+        DELETE FROM cannabis
+        WHERE datetime_downloaded = '{datetime}';
     """)
 
 
@@ -78,7 +80,7 @@ class StringIteratorIO(io.TextIOBase):
 
 def copy_string_iterator(connection, cannabs: Iterator[Dict[str, Any]], size: int = 8192, datetime: str = None, date: str = None) -> None:
     with connection.cursor() as cursor:
-        create_staging_table(cursor)
+        create_staging_table(cursor, datetime)
 
         cannabs_string_iterator = StringIteratorIO((
             ';'.join(map(clean_csv_value, (
