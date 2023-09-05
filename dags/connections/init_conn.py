@@ -10,7 +10,6 @@ def init_connections():
     ae_conn_id = set([conn.conn_id for conn in session.query(Connection).all()])
 
     for conn in (conn_id - ae_conn_id):
-        print()
         session.add(Connection(**connections[conn]))
 
     session.commit()

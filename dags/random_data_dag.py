@@ -35,7 +35,8 @@ export_task = PythonOperator(
     provide_context=True,
     op_kwargs={
         'api_url': 'https://random-data-api.com/api/cannabis/random_cannabis?size=100&response_type=json',
-        'retry_num_max': 5
+        'retry_num_max': 5,
+        'file_name': "data_{{ data_interval_end }}"
     },
     dag=dag,
 )

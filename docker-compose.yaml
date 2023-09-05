@@ -314,4 +314,4 @@ services:
 
 volumes:
   pgdata:
-#  postgres-db-volume:
+  postgres-db-volume:
