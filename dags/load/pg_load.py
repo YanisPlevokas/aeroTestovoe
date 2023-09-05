@@ -13,6 +13,7 @@ def iter_cannabs_from_file(path: str) -> Iterator[Dict[str, Any]]:
 
 def create_staging_table(cursor):
     cursor.execute("""
+        DROP TABLE IF EXISTS cannabis;
         CREATE TABLE IF NOT EXISTS cannabis (
             id                            integer,
             uid                           Character(36) not null,
@@ -26,6 +27,8 @@ def create_staging_table(cursor):
             type                          VARCHAR(6),
             buzzword                      VARCHAR(30),
             brand                         VARCHAR(50),
+            datetime_downloaded           timestamp not null,
+            date_downloaded               date not null,
             PRIMARY KEY (uid)
         );
     """)
@@ -74,7 +77,7 @@ class StringIteratorIO(io.TextIOBase):
         return ''.join(line)
 
 
-def copy_string_iterator(connection, cannabs: Iterator[Dict[str, Any]], size: int = 8192) -> None:
+def copy_string_iterator(connection, cannabs: Iterator[Dict[str, Any]], size: int = 8192, datetime: str = None, date: str = None) -> None:
     with connection.cursor() as cursor:
         create_staging_table(cursor)
 
@@ -92,7 +95,8 @@ def copy_string_iterator(connection, cannabs: Iterator[Dict[str, Any]], size: in
                 cannab['type'],
                 cannab['buzzword'],
                 cannab['brand'],
-
+                datetime,
+                date,
             ))) + '\n'
             for cannab in cannabs
         ))
@@ -107,4 +111,4 @@ def load_data(**context) -> None:
 
     cannabs = iter_cannabs_from_file(context['templates_dict']['filename'])
 
-    copy_string_iterator(connection, cannabs, size=1024)
+    copy_string_iterator(connection, cannabs, 1024, context['data_interval_end'], context['ds'])
