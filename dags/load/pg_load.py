@@ -13,7 +13,6 @@ def iter_cannabs_from_file(path: str) -> Iterator[Dict[str, Any]]:
 
 def create_staging_table(cursor):
     cursor.execute("""
-        DROP TABLE IF EXISTS cannabis;
         CREATE TABLE IF NOT EXISTS cannabis (
             id                            integer,
             uid                           Character(36) not null,
